@@ -45,87 +45,190 @@ def resub(pat, repl, label, flags=re.S, min_n=1):
     log.append(f"ok x{n}: {label}")
 
 # ============================================================
-# 1) OCCUPATION SALARIES  (Peru S/ -> Ecuador USD)
+# 1) OCCUPATION SALARIES — explicit Ecuador USD per occupation
+#    (junior, senior) anchored to the salary research: Computrabajo EC,
+#    Multitrabajos Index, INEC-ENEMDU, MSP & Magisterio public scales,
+#    sectoral minimums. SBU 2026 = $482 floor. Keyed by (level, name).
 # ============================================================
 SBU = 482
-def soles(s):
-    m = re.search(r'[\d,]+', s)
-    return int(m.group(0).replace(',', '')) if m else None
-def usd(v):
-    return f"${v:,}"
-def r10(v):
-    return int(round(v / 10.0) * 10)
+def usd(v): return f"${v:,}"
+def r10(v): return int(round(v / 10.0) * 10)
 
-# Researched anchors (junior, senior) USD — salary agent (Computrabajo/INEC/MSP/
-# Magisterio/Multitrabajos 2025-26). Applied by name substring; longest keys win.
-OVERRIDES = {
-    'Medicina': (1100, 2600),
-    'Ingeniería de Sistemas': (700, 2000),
-    'Ciencias de la Computación': (750, 2200),
-    'Ingeniería de Telecomunicaciones': (700, 1800),
-    'Ingeniería Minera': (950, 2600),
-    'Geología': (900, 2400),
-    'Ingeniería Civil': (650, 1450),
-    'Ingeniería Industrial': (800, 1900),
-    'Ingeniería Eléctrica': (850, 2000),
-    'Ingeniería Electrónica': (800, 1900),
-    'Derecho': (650, 1600),
-    'Economía': (700, 1800),
-    'Administración de Empresas': (600, 1400),
-    'Contabilidad y Finanzas': (520, 1100),
-    'Marketing': (580, 1400),
-    'Psicología': (620, 1400),
-    'Odontología': (650, 1500),
-    'Obstetricia': (1000, 1700),
-    'Veterinaria': (560, 1200),
-    'Arquitectura y Urbanismo': (520, 1200),
-    'Agronegocios': (700, 1600),
-    'Estadística': (800, 2400),
-    'Diseño': (470, 950),
-    'Periodismo y Locución': (560, 1300),
-    'Ciencias de la Comunicación': (560, 1250),
+ECU_SAL = {
+  # --- MINERÍA ---
+  ('secundaria','Peón de mina'):(500,640),
+  ('secundaria','Ayudante de perforación'):(520,720),
+  ('tecnica','Técnico en Minería, Metalurgia y Petróleo'):(950,1900),
+  ('universitaria','Ingeniería Minera, Metalurgia y Petróleo'):(1000,2800),
+  ('universitaria','Geología'):(900,2400),
+  # --- TECNOLOGÍA ---
+  ('tecnica','Técnico en Ciencias de la Computación'):(590,1200),
+  ('tecnica','Técnico de Telecomunicaciones'):(550,1100),
+  ('tecnica','Técnico Electrónica'):(500,950),
+  ('universitaria','Ingeniería de Sistemas y Cómputo'):(700,2000),
+  ('universitaria','Ciencias de la Computación'):(750,2300),
+  ('universitaria','Ingeniería de Telecomunicaciones'):(700,1800),
+  ('universitaria','Ingeniería Electrónica'):(800,1900),
+  ('universitaria','Estadística'):(800,2400),
+  ('universitaria','Matemática'):(700,1700),
+  ('universitaria','Física'):(700,1500),
+  # --- INFRAESTRUCTURA ---
+  ('secundaria','Peón de obra / Ayudante de albañil'):(500,560),
+  ('secundaria','Pintor de obra'):(480,650),
+  ('secundaria','Gasfitero / Ayudante'):(490,700),
+  ('secundaria','Soldador'):(530,900),
+  ('secundaria','Ayudante de electricista'):(490,650),
+  ('secundaria','Operario de fábrica'):(440,600),
+  ('tecnica','Técnico Civil'):(600,1100),
+  ('tecnica','Técnico Electricista'):(501,1100),
+  ('tecnica','Técnico Mecánica'):(520,1000),
+  ('tecnica','Técnico Industrial'):(650,1500),
+  ('tecnica','Arquitectura y Urbanismo'):(500,900),
+  ('tecnica','Textil y Confecciónes'):(470,750),
+  ('universitaria','Ingeniería Civil'):(650,1500),
+  ('universitaria','Ingeniería Eléctrica'):(850,2000),
+  ('universitaria','Ingeniería Mecánica'):(800,2100),
+  ('universitaria','Ingeniería Industrial'):(800,1900),
+  ('universitaria','Arquitectura y Urbanismo'):(550,1300),
+  ('universitaria','Ingeniería Sanitaria'):(750,1800),
+  ('universitaria','Ingeniería Naval y Aeronáutica'):(800,2000),
+  ('universitaria','Ingeniería Textil y Confecciónes'):(700,1500),
+  ('universitaria','Otras Ingenierías'):(750,1800),
+  # --- AGRONEGOCIOS ---
+  ('secundaria','Operario agrícola'):(482,600),
+  ('secundaria','Trabajador de planta de empaque'):(470,620),
+  ('secundaria','Operario de planta de alimentos'):(470,650),
+  ('tecnica','Agropecuaria'):(500,1000),
+  ('tecnica','Técnico en Industrias Alimentarias'):(550,1100),
+  ('universitaria','Agronegocios'):(700,1800),
+  ('universitaria','Agropecuaria'):(650,1500),
+  ('universitaria','Zootecnia'):(600,1300),
+  ('universitaria','Veterinaria'):(560,1300),
+  ('universitaria','Ingeniería en Agroindustria'):(650,1500),
+  ('universitaria','Ingeniería en Industrias Alimentarias'):(700,1600),
+  ('universitaria','Ciencias Forestales'):(650,1300),
+  ('universitaria','Ingeniería Pesquera'):(700,1500),
+  # --- TURISMO ---
+  ('secundaria','Mozo / Mesero'):(446,650),
+  ('secundaria','Cocinero'):(480,850),
+  ('secundaria','Auxiliar de cocina'):(470,650),
+  ('secundaria','Recepcionista de hotel'):(440,700),
+  ('secundaria','Housekeeping / Limpieza de cuartos'):(460,600),
+  ('secundaria','Barista'):(460,650),
+  ('tecnica','Administración de Servicios Turisticos, Hotelería y Gastronomía'):(550,1200),
+  ('tecnica','Turismo'):(480,1000),
+  ('universitaria','Administración de Servicios Turisticos, Hotelería y Gastronomía'):(600,1500),
+  # --- ADMINISTRACIÓN ---
+  ('secundaria','Vendedor de tienda'):(501,750),
+  ('secundaria','Cajero'):(460,650),
+  ('secundaria','Promotor / Impulsador'):(460,650),
+  ('secundaria','Recepcionista'):(450,700),
+  ('secundaria','Call center / Teleoperador'):(470,750),
+  ('tecnica','Administración de Empresas'):(500,950),
+  ('tecnica','Negocios Internacionales'):(550,1200),
+  ('tecnica','Secretariado'):(480,850),
+  ('tecnica','Técnico en Marketing'):(520,1100),
+  ('tecnica','Técnico en Contabilidad y Finanzas'):(470,900),
+  ('universitaria','Economía'):(700,2000),
+  ('universitaria','Administración de Empresas'):(600,1600),
+  ('universitaria','Marketing'):(600,1600),
+  ('universitaria','Contabilidad y Finanzas'):(520,1200),
+  ('universitaria','Derecho'):(650,1800),
+  ('universitaria','Negocios Internacionales'):(600,1500),
+  ('universitaria','Otras Carreras de Administración'):(600,1400),
+  ('universitaria','Administración Pública'):(700,1500),
+  ('universitaria','Investigación Operativa'):(750,1800),
+  ('universitaria','Ciencias Políticas'):(600,1400),
+  # --- SALUD ---
+  ('secundaria','Auxiliar de farmacia'):(470,650),
+  ('tecnica','Enfermeria'):(520,1000),
+  ('tecnica','Técnico en Farmacia y Bioquímica'):(490,800),
+  ('tecnica','Técnico en Tecnología Médica'):(520,900),
+  ('universitaria','Medicina'):(1100,2800),
+  ('universitaria','Enfermeria'):(1000,1800),
+  ('universitaria','Psicología'):(620,1500),
+  ('universitaria','Odontología'):(650,1500),
+  ('universitaria','Obstetricia'):(1000,1800),
+  ('universitaria','Farmacia y Bioquímica'):(700,1600),
+  ('universitaria','Tecnología Médica'):(650,1300),
+  ('universitaria','Nutrición'):(600,1300),
+  ('universitaria','Trabajo Social'):(550,1200),
+  ('universitaria','Servicios Sociales y Asistenciales'):(550,1100),
+  # --- EDUCACIÓN (escala Magisterio fiscal $817-2034; privado menor) ---
+  ('tecnica','Educación Inicial'):(500,900),
+  ('tecnica','Educación Primaria'):(520,950),
+  ('tecnica','Educación Secundaria'):(540,1000),
+  ('universitaria','Educación Inicial'):(700,1400),
+  ('universitaria','Educación Primaria'):(750,1500),
+  ('universitaria','Educación Secundaria'):(800,1600),
+  ('universitaria','Educación Física'):(700,1400),
+  ('universitaria','Educación Especial'):(750,1500),
+  ('universitaria','Educación Tecnológica'):(750,1500),
+  ('universitaria','Idiomas'):(700,1500),
+  ('universitaria','Otras Carreras de Educación'):(700,1400),
+  # --- COMUNICACIÓN Y DISEÑO ---
+  ('tecnica','Ciencias de la Comunicación'):(550,1100),
+  ('tecnica','Técnico en Diseño'):(460,900),
+  ('universitaria','Ciencias de la Comunicación'):(560,1300),
+  ('universitaria','Diseño'):(500,1300),
+  ('universitaria','Periodismo y Locución'):(560,1300),
+  ('universitaria','Artes'):(500,1100),
+  ('universitaria','Bibliotecología y Archivo'):(550,1100),
+  ('universitaria','Lingüistica y Literatura'):(550,1100),
+  ('universitaria','Historia'):(550,1100),
+  ('universitaria','Teología y Filosofía'):(500,1000),
+  ('universitaria','Antropología y Arqueología'):(550,1200),
+  ('universitaria','Geografía'):(600,1300),
+  # --- CIENCIAS Y MEDIO AMBIENTE ---
+  ('tecnica','Química'):(550,1000),
+  ('universitaria','Química'):(650,1400),
+  ('universitaria','Biología'):(650,1500),
+  ('universitaria','Ecología y Medio Ambiente'):(600,1400),
+  # --- SERVICIOS Y SEGURIDAD ---
+  ('secundaria','Vigilante / Agente de seguridad'):(517,750),
+  ('secundaria','Personal de limpieza'):(460,580),
+  ('secundaria','Cuidador de adultos mayores'):(460,650),
+  ('secundaria','Trabajador del hogar'):(460,580),
+  ('secundaria','Peluquero / Barbero'):(470,900),
+  ('secundaria','Costurera / Sastre'):(460,750),
+  # --- LOGÍSTICA Y TRANSPORTE ---
+  ('secundaria','Auxiliar de almacén'):(458,750),
+  ('secundaria','Repartidor / Delivery'):(442,650),
+  ('secundaria','Chofer / Conductor'):(591,900),
+  ('secundaria','Estibador / Cargador'):(486,650),
+  ('secundaria','Operador de montacargas'):(500,800),
 }
-def anchor(name):
-    best = None
-    for k, v in OVERRIDES.items():
-        if k in name and (best is None or len(k) > len(best[0])):
-            best = (k, v)
-    return best[1] if best else None
 
-def rebase_j(p):
-    lo_p, hi_p, lo_e, hi_e = 1500, 6300, 480, 1250
-    p = max(lo_p, min(hi_p, p))
-    return max(SBU, r10(lo_e + (p - lo_p) / (hi_p - lo_p) * (hi_e - lo_e)))
-def rebase_s(p):
-    lo_p, hi_p, lo_e, hi_e = 2200, 12100, 700, 3000
-    p = max(lo_p, min(hi_p, p))
-    return max(620, r10(lo_e + (p - lo_p) / (hi_p - lo_p) * (hi_e - lo_e)))
+# level of an occupation = the most recent secundaria:/tecnica:/universitaria: marker
+_markers = [(mm.start(), mm.group(1)) for mm in
+            re.finditer(r'(secundaria|tecnica|universitaria):\[', src)]
+def level_at(pos):
+    lvl = 'universitaria'
+    for p, l in _markers:
+        if p < pos: lvl = l
+        else: break
+    return lvl
 
-_conv = {'n': 0}
+_missing = []
 def conv(m):
-    name, sal, grow, rng, rngA = m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
-    if sal == 'Variable':
-        return m.group(0)
-    pj, ps = soles(sal), soles(grow)
-    ov = anchor(name)
-    if ov:
-        j, s = ov
+    name = m.group(1)
+    lvl = level_at(m.start())
+    if (lvl, name) in ECU_SAL:
+        j, s = ECU_SAL[(lvl, name)]
     else:
-        j = rebase_j(pj)
-        s = rebase_s(ps) if ps else rebase_j(pj) + 400
-    if s <= j:
-        s = j + 300
-    _conv['n'] += 1
-    out = f"name:'{name}',salary:'{usd(j)}',growth:'{usd(s)}'"
-    if rng is not None:
-        out += f",range:'{usd(max(SBU, r10(j*0.8)))} – {usd(r10(j*1.35))}'"
-    if rngA is not None:
-        out += f",rangeAdult:'{usd(r10(s*0.7))} – {usd(r10(s*1.6))}'"
-    return out
+        _missing.append((lvl, name))
+        j, s = {'secundaria': (482, 650), 'tecnica': (550, 1100),
+                'universitaria': (650, 1500)}[lvl]
+    return (f"name:'{name}',salary:'{usd(j)}',growth:'{usd(s)}'"
+            f",range:'{usd(max(SBU, r10(j*0.8)))} – {usd(r10(j*1.3))}'"
+            f",rangeAdult:'{usd(r10(s*0.7))} – {usd(r10(s*1.6))}'")
 
-resub(r"name:'([^']*)',salary:'([^']*)',growth:'([^']*)'(?:,range:'([^']*)')?(?:,rangeAdult:'([^']*)')?",
+resub(r"name:'([^']*)',salary:'(?:S/[^']*|Variable)',growth:'[^']*'(?:,range:'[^']*')?(?:,rangeAdult:'[^']*')?",
       conv, 'occupation salaries', min_n=120)
-log.append(f"   -> {_conv['n']} salaried occupations converted to USD")
+if _missing:
+    errors.append('UNMAPPED occupations: ' + '; '.join(f'{l}/{n}' for l, n in _missing))
+log.append(f"   -> {len(ECU_SAL)} occupations priced in USD (0 unmapped)" if not _missing
+           else f"   -> {len(_missing)} UNMAPPED")
 
 # ============================================================
 # 2) HOME — youth pathway (real ENEMDU 15-24 partition) + access

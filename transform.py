@@ -161,6 +161,18 @@ rep("desc:'Perú es potencia gastronómica y turística mundial.'",
     "desc:'Galápagos, Andes, Amazonía y Costa hacen de Ecuador un destino turístico mundial.'", 1, 'turismo desc')
 rep("desc:'Sector con alta demanda, especialmente en Lima.'",
     "desc:'Sector con alta demanda, especialmente en Quito y Guayaquil.'", 1, 'servicios desc')
+rep("desc:'Sector con alta remuneración promedio en el país, dependiendo del rol, la experiencia y la región.'",
+    "desc:'La nueva minería ecuatoriana (Fruta del Norte, Mirador) y el petróleo ofrecen de los mejores salarios técnicos del país.'", 1, 'mineria desc')
+rep("desc:'Sector relacionado con construcción, obras públicas y desarrollo de infraestructura en distintas regiones del país.'",
+    "desc:'Construcción, obras públicas y vías en las provincias del Ecuador (carreteras, hidroeléctricas, vivienda).'", 1, 'infra desc')
+rep("desc:'Todas las empresas necesitan administradores y contadores.'",
+    "desc:'Toda empresa en Ecuador necesita administración, ventas, contabilidad y comercio exterior.'", 1, 'admin desc')
+rep("desc:'El sector salud siempre tiene demanda laboral.'",
+    "desc:'Salud con demanda constante en el MSP, el IESS y clínicas privadas de todo el país.'", 1, 'salud desc')
+rep("desc:'Formación de las nuevas generaciones del país.'",
+    "desc:'Docencia con escala salarial del Magisterio fiscal y alta demanda en todo el Ecuador.'", 1, 'educacion desc')
+rep("desc:'El boom del e-commerce impulsa la logística.'",
+    "desc:'El comercio electrónico y los puertos (Guayaquil, Manta) impulsan la logística y el transporte.'", 1, 'logistica desc')
 
 # ============================================================
 # SECTION F — STUDY-TEXT SWAPS (institutos + universidades + país)
@@ -219,6 +231,8 @@ rep('CETPRO = formación técnica corta · Instituto/Técnico = formación profe
     'Cursos cortos / SECAP = formación rápida · Instituto/Tecnológico = formación profesional (2-3 años) · Universidad = carrera de tercer nivel (4-5 años)', 1, 'tier legend')
 rep('tracking-wider mb-1">CETPRO</p>', 'tracking-wider mb-1">Cursos cortos / SECAP</p>', 1, 'CETPRO badge')
 rep_all("'Universidad (5 años)'", "'Universidad (4-5 años)'", 2, 'uni duration labels')
+rep_all('Secundaria completa', 'Bachillerato completo', 2, 'secundaria->bachillerato label')
+rep('Carrera técnica (2-3 años)', 'Carrera técnica / tecnológica (2-3 años)', 1, 'tecnica label')
 
 # ============================================================
 # SECTION H — "DONDE TRABAJAR" / SOURCE FOOTERS that mention MTPE / Mi Carrera
