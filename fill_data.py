@@ -446,6 +446,14 @@ rep('Explorar sectores y carreras con salarios verificados',
     'Explorar sectores y carreras con datos del mercado laboral', 1, 'chat bullet')
 rep_all('Ministerio de Trabajo, universidades, institutos, becas',
         'el INEC, universidades, institutos, la SENESCYT y becas', 1, 'notebook sources')
+# route-finder quiz: replace Peru "tuition cost" logic (in Ecuador public study is free) ---
+rep('Mis padres pueden apoyarme con los estudios',
+    'Puedo dedicarme a estudiar a tiempo completo', 1, 'quiz econ opt1')
+rep('Necesito algo accesible o una beca',
+    'La pública es gratis; quizás necesite una beca de manutención', 1, 'quiz econ opt2')
+rep('Necesito aportar a la casa',
+    'Necesito trabajar y aportar en casa ya', 1, 'quiz econ opt3')
+# privada cost reference already in Ecuador USD inside rts; nothing else to change here.
 
 io.open(DST, 'w', encoding='utf-8').write(src)
 print('\n'.join(log))

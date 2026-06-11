@@ -41,12 +41,26 @@ def rep_all(old, new, min_n=1, label=''):
 # ============================================================
 # SECTION A — BRANDING / FRAMING
 # ============================================================
-rep('<title>Eligiendo Mi Camino — Programa Educativo</title>',
-    '<title>Eligiendo Mi Camino Ecuador — Programa Educativo</title>', 1, 'title')
+_META = '''<title>Eligiendo Mi Camino Ecuador — Programa Educativo</title>
+  <meta name="description" content="Orientación vocacional para estudiantes de 3ro de bachillerato en Ecuador: conócete, explora carreras con datos reales (salarios en USD, rutas y becas) y construye tu plan. Banco Mundial × uDocz.">
+  <meta name="theme-color" content="#F57B21">
+  <link rel="icon" type="image/png" href="gallito.png">
+  <link rel="apple-touch-icon" href="gallito.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Eligiendo Mi Camino — Ecuador">
+  <meta property="og:description" content="Orientación vocacional con datos reales de Ecuador: carreras, salarios en USD, rutas post-bachillerato y becas. Para 3ro de bachillerato.">
+  <meta property="og:image" content="https://ezequielmolina-lang.github.io/eligiendo-mi-camino-ecuador/gallito.png">
+  <meta property="og:url" content="https://ezequielmolina-lang.github.io/eligiendo-mi-camino-ecuador/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Eligiendo Mi Camino — Ecuador">
+  <meta name="twitter:description" content="Orientación vocacional con datos reales de Ecuador para 3ro de bachillerato.">'''
+rep('<title>Eligiendo Mi Camino — Programa Educativo</title>', _META, 1, 'title + meta/og/favicon')
 rep('Para estudiantes de 5to de secundaria en Lima',
     'Para estudiantes de 3ro de bachillerato en Ecuador', 1, 'audience')
 rep('>Datos reales del Ministerio de Trabajo<',
     '>Datos reales del INEC y SENESCYT<', 1, 'welcome badge')
+rep('<p className="text-[11px] text-navy-300">Programa Educativo</p>',
+    '<p className="text-[11px] text-navy-300">Programa Educativo · Ecuador 🇪🇨</p>', 1, 'sidebar subtitle')
 
 # ============================================================
 # SECTION B — MASCOT: "Gallito de las Rocas" (ave nacional del Perú)
@@ -238,10 +252,13 @@ rep('Carrera técnica (2-3 años)', 'Carrera técnica / tecnológica (2-3 años)
 # SECTION H — "DONDE TRABAJAR" / SOURCE FOOTERS that mention MTPE / Mi Carrera
 #   (done here explicitly so the later generic MTPE cleanup is a no-op)
 # ============================================================
+_SALSRC = ('Estimaciones de mercado en USD (INEC–ENEMDU, Computrabajo, Multitrabajos y escalas '
+           'públicas), 2025. Ecuador no tiene un portal oficial de salarios por carrera, '
+           'así que son referencias aproximadas, no cifras exactas.')
 rep('Fuente: Portal Mi Carrera — Ministerio de Trabajo y Promoción del Empleo (MTPE), 2025 · Lima Metropolitana',
-    'Fuente: INEC — Encuesta ENEMDU y guías salariales de mercado (Multitrabajos, Computrabajo), 2025', 1, 'explore footer')
+    'Fuente: ' + _SALSRC, 1, 'explore footer')
 rep('Fuente: Portal Mi Carrera — Ministerio de Trabajo y Promoción del Empleo (MTPE), 2025',
-    'Fuente: INEC — Encuesta ENEMDU y guías salariales de mercado (Multitrabajos, Computrabajo), 2025', 1, 'careerdetail footer')
+    'Fuente: ' + _SALSRC, 1, 'careerdetail footer')
 rep_all('Sin datos del Ministerio de Trabajo', 'Sin datos oficiales', 1, 'no-data chip')
 rep('El Ministerio de Trabajo no cuenta con datos salariales formales para esta ocupación.',
     'No hay datos salariales formales para esta ocupación.', 1, 'no-data career detail')

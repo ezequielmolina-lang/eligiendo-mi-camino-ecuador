@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Eligiendo Mi Camino Ecuador — Programa Educativo</title>
+  <meta name="description" content="Orientación vocacional para estudiantes de 3ro de bachillerato en Ecuador: conócete, explora carreras con datos reales (salarios en USD, rutas y becas) y construye tu plan. Banco Mundial × uDocz.">
+  <meta name="theme-color" content="#F57B21">
+  <link rel="icon" type="image/png" href="gallito.png">
+  <link rel="apple-touch-icon" href="gallito.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Eligiendo Mi Camino — Ecuador">
+  <meta property="og:description" content="Orientación vocacional con datos reales de Ecuador: carreras, salarios en USD, rutas post-bachillerato y becas. Para 3ro de bachillerato.">
+  <meta property="og:image" content="https://ezequielmolina-lang.github.io/eligiendo-mi-camino-ecuador/gallito.png">
+  <meta property="og:url" content="https://ezequielmolina-lang.github.io/eligiendo-mi-camino-ecuador/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Eligiendo Mi Camino — Ecuador">
+  <meta name="twitter:description" content="Orientación vocacional con datos reales de Ecuador para 3ro de bachillerato.">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -556,7 +568,7 @@ function App(){
           </button>
           <OwlMini size={36}/>
           <div><h2 className="font-extrabold text-navy-700 text-sm leading-tight">Eligiendo Mi Camino</h2>
-          <p className="text-[11px] text-navy-300">Programa Educativo</p></div>
+          <p className="text-[11px] text-navy-300">Programa Educativo · Ecuador 🇪🇨</p></div>
         </div>
       </div>
       <div className="px-5 py-3 border-b border-cream-200">
@@ -1155,9 +1167,9 @@ function App(){
       {t:"2-3 años maximo",w:[0,2,0]},
       {t:"Necesito trabajar ya, pero puedo estudiar de noche",w:[0,1,2]}]},
     {q:"¿Cómo es tu situación económica familiar?",opts:[
-      {t:"Mis padres pueden apoyarme con los estudios",w:[2,1,0]},
-      {t:"Necesito algo accesible o una beca",w:[1,2,0]},
-      {t:"Necesito aportar a la casa",w:[0,0,2]}]},
+      {t:"Puedo dedicarme a estudiar a tiempo completo",w:[2,1,0]},
+      {t:"La pública es gratis; quizás necesite una beca de manutención",w:[1,2,0]},
+      {t:"Necesito trabajar y aportar en casa ya",w:[0,0,2]}]},
     {q:"¿Qué te describe mejor?",opts:[
       {t:"Me gusta la teoria, investigar y leer",w:[2,0,0]},
       {t:"Prefiero lo práctico, hacer cosas con las manos",w:[0,2,1]},
@@ -1451,7 +1463,7 @@ function App(){
               </div>
             </div>);
           })}
-          <p className="text-[11px] text-navy-300 text-center mt-4">Fuente: INEC — Encuesta ENEMDU y guías salariales de mercado (Multitrabajos, Computrabajo), 2025</p>
+          <p className="text-[11px] text-navy-300 text-center mt-4">Fuente: Estimaciones de mercado en USD (INEC–ENEMDU, Computrabajo, Multitrabajos y escalas públicas), 2025. Ecuador no tiene un portal oficial de salarios por carrera, así que son referencias aproximadas, no cifras exactas.</p>
           <button onClick={()=>{mark(4);nav('home');}} className="w-full mt-4 py-3.5 bg-gradient-to-r from-brand-400 to-brand-300 text-white rounded-xl font-bold shadow-lg hover:opacity-90 transition">Completar paso</button>
         </div>)}
       </div>
@@ -1504,7 +1516,7 @@ function App(){
           <h3 className="font-bold text-navy-700 text-sm mb-3">¿Dónde puedes trabajar?</h3>
           <div className="flex flex-wrap gap-2">{c.where.map((w,i)=><span key={i} className="px-3 py-1.5 bg-navy-50 text-navy-600 text-sm rounded-lg font-bold">{w}</span>)}</div>
         </div>)}
-        <p className="text-[11px] text-navy-300 text-center mt-4">Fuente: INEC — Encuesta ENEMDU y guías salariales de mercado (Multitrabajos, Computrabajo), 2025</p>
+        <p className="text-[11px] text-navy-300 text-center mt-4">Fuente: Estimaciones de mercado en USD (INEC–ENEMDU, Computrabajo, Multitrabajos y escalas públicas), 2025. Ecuador no tiene un portal oficial de salarios por carrera, así que son referencias aproximadas, no cifras exactas.</p>
       </div>
     </div>);
   };
